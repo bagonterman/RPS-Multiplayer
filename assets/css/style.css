@@ -30,6 +30,8 @@ h1{
     padding:20px;
     width:100px;
     height:100px;
+    background-size: 110px 110px;
+    background-repeat: no-repeat;
 }
 #paper{
     float: none;
@@ -38,6 +40,8 @@ h1{
     padding:20px;
     width:100px;
     height:100px;
+    background-size: 110px 110px;
+    background-repeat: no-repeat;
 }
 #scissors{
     float: none;
@@ -46,4 +50,6 @@ h1{
     padding:20px;
     width:100px;
     height:100px;
+    background-size: 110px 110px;
+    background-repeat: no-repeat;
 }
