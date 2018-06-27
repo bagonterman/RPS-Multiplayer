@@ -33,9 +33,17 @@ buildNewGame();
         var wins = 0;
         var choice = "";
         var turns=0;
+        var NUM_PLAYERS = 2;
         
 
-
+////////////////////making a listener///////////////////
+var watcher = dataRef.ref();
+watcher.on('value', function(snapshot) {
+  console.log(snapshot.val());
+  console.log(snap.val()[yourPlayerTxt+yourPlayer][yourPlayer].choice);
+  console.log(snap.val()[opPlayer][opNum].choice);
+  //updateStarCount(postElement, snapshot.val());
+});
 
 
     
@@ -47,7 +55,7 @@ buildNewGame();
           turns++
           e.preventDefault();
           var buttonValue=e.target.title; ////title is either rock paper or scissors//
-          console.log(e.target.id)
+          //console.log(e.target.id)
           //e.target.css("color", "red");
           //$('#'+e.target.id).css("color", "red");
         // $('#'+e.target.id).css("background-color", "red");
@@ -55,53 +63,47 @@ buildNewGame();
           dataRef.ref().once("value", function(snapshot) {
           // Log everything that's coming out of snapshot
            test="1";
-          yourPlayer=="One"?(playerVal=0,oponent=1): (playerVal=1,oponent=0);
+          yourPlayer=="One"?(playerVal=0,oponent=1,opPlayer="PlayerTwo",opNum="Two"): (playerVal=1,oponent=0,opPlayer="PlayerOne",opNum="One");
           //console.log(Object.keys(snapshot.val()));
           //console.log(snapshot.val()[Object.keys(snapshot.val())[playerVal]].PlayerOne.One.choice);
-          console.log(yourPlayer);
-          console.log(playerVal);
+          // console.log(yourPlayer);
+          // console.log(playerVal);
           var snap=snapshot
-          console.log(Object.keys(snapshot.val())[oponent]);
+          //console.log(Object.keys(snapshot.val())[oponent]);
           oponentKey=Object.keys(snapshot.val())[oponent];
           // if(oponentKey!="undefined"){
 
           // }
-          dataRef.ref().child(`/${Object.keys(snapshot.val())[playerVal]}/${yourPlayerTxt+yourPlayer}/${yourPlayer}`).update({
+          // dataRef.ref().child(`/${Object.keys(snapshot.val())[playerVal]}/${yourPlayerTxt+yourPlayer}/${yourPlayer}`).update({
+            dataRef.ref().child(`/${yourPlayerTxt+yourPlayer}/${yourPlayer}`).update({
             choice: buttonValue,
             turns: turns
-
-           
         });
-        //console.log(snap);
-        
-        //console.log(snap.val())
-        console.log(yourPlayerTxt+yourPlayer);
-        console.log(yourPlayer);
-        player=yourPlayerTxt+yourPlayer
-        
-        console.log(snap.val()[Object.keys(snap.val())[playerVal]][player][yourPlayer]);
-        console.log(snap.val()[Object.keys(snap.val())[playerVal]][player][yourPlayer][choice]);
-        //console.log(snap.val()[Object.keys(snap.val())[oponent]][oponentPlayer][opNum][choice]);
-        //console.log(snap.val()[Object.keys(snap.val())[0]].player.yourPlayer.choice);
-          //console.log(snapshot.val()[Object.keys(snapshot.val())[0]][Player1]
-          //console.log(snapshot.val()[Object.keys(snapshot.val())[0]][Player1]);
-          //console.log(snapshot.val()[Object.keys(snapshot.val())[0]]["[Player1 1]"]);
-          //console.log(snapshot.val()[Object.keys(snapshot.val())[0]][{Player1}]);
-         
-          // console.log(snapshot.val().PlayerIdS);
-          // console.log(snapshot.val().wins);
+        // console.log(snap.val()[yourPlayerTxt+yourPlayer][yourPlayer].choice);
+        // console.log(snap.val()[opPlayer][opNum].choice);
+        // console.log(snap.val()[Object.keys(snap.val())[playerVal]][player][yourPlayer].choice);/////works
+        // console.log(snap.val()[Object.keys(snap.val())[oponent]][opPlayer][opNum].choice);/////works
 
-          // Change the HTML to reflect
-          // $("#name-display").text(snapshot.val().name);
-          
-          // $("#email-display").text(snapshot.val().email);
-          // $("#age-display").text(snapshot.val().age);
-          // $("#comment-display").text(snapshot.val().comment);
 
           // Handle the errors
         }, function(errorObject) {
           console.log("Errors handled: " + errorObject.code);
-        });
+        }).then((snap) => {
+          // console.log(snap.val()[yourPlayerTxt+yourPlayer][yourPlayer].choice);
+          // console.log(snap.val()[opPlayer][opNum].choice);
+          myWins=snap.val()[yourPlayerTxt+yourPlayer][yourPlayer].wins;
+          myTurns=snap.val()[yourPlayerTxt+yourPlayer][yourPlayer].turns;
+          myLosses=snap.val()[yourPlayerTxt+yourPlayer][yourPlayer].losses;
+          $( ".outcome" ).html( `<p>wins: <span id="wins">${myWins}</span><br>
+          losses: <span id="losses">${myLosses}</span><br>
+          turns: <span id="turns">${myTurns}</span></p>`);
+          //   const key = snap.key 
+          //   console.log(key);
+          //   dataRef.ref().child(`/${key}/${yourPlayerTxt+yourPlayer}/${yourPlayer}`).update({
+          //     PlayerId: key
+             
+          // });
+         });
 
 
 
@@ -135,7 +137,7 @@ buildNewGame();
         //   var key2 = Object.keys(snapshot.val())[1];
         //  console.log(key2);
         }
-          playerPush=dataRef.ref().push({
+          playerPush=dataRef.ref().update({
             
           [yourPlayerTxt+yourPlayer]:{
           [yourPlayer]:{
@@ -150,15 +152,18 @@ buildNewGame();
         }
         
   }).then((snap) => {
-    const key = snap.key 
-    console.log(key);
-    dataRef.ref().child(`/${key}/${yourPlayerTxt+yourPlayer}/${yourPlayer}`).update({
-      PlayerId: key
+  //   const key = snap.key 
+  //   console.log(key);
+  //   dataRef.ref().child(`/${key}/${yourPlayerTxt+yourPlayer}/${yourPlayer}`).update({
+  //     PlayerId: key
      
-  });
+  // });
  })
 }///end of snapshot function
 )
+/////////////////////////
+
+
 return yourPlayer
 }///end of writeData
 }
