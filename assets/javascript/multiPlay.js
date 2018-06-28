@@ -37,13 +37,61 @@ buildNewGame();
         
 
 ////////////////////making a listener///////////////////
+function runOn(){
 var watcher = dataRef.ref();
-watcher.on('value', function(snapshot) {
-  console.log(snapshot.val());
-  console.log(snap.val()[yourPlayerTxt+yourPlayer][yourPlayer].choice);
-  console.log(snap.val()[opPlayer][opNum].choice);
+watcher.once('value', function(snapshot) {
+  //console.log(snapshot.val());
+  //console.log(snapshot.val()[yourPlayerTxt+yourPlayer][yourPlayer].choice);
+  //console.log(snapshot.val()[opPlayer][opNum].choice);
+  //myWins=snapshot.val()[PlayerOne][One].wins;
+
+  myWins=snapshot.val().PlayerOne.One.wins;
+  myTurns=snapshot.val().PlayerOne.One.turns;
+  myLosses=snapshot.val().PlayerOne.One.losses;
+  myChoice=snapshot.val().PlayerOne.One.choice;
+  otherWins=snapshot.val().PlayerTwo.Two.wins;
+  otherTurns=snapshot.val().PlayerTwo.Two.turns;
+  otherLosses=snapshot.val().PlayerTwo.Two.losses;
+  otherChoice=snapshot.val().PlayerTwo.Two.choice;
+  console.log(myChoice+"  "+otherChoice);
+  if((myChoice=="Rock"&&otherChoice=="Paper")||(myChoice=="Paper"&&otherChoice=="Scissors")||(myChoice=="Scissors"&&otherChoice=="Rock")){
+    $("#wins").text(wins++);
+    dataRef.ref().child(`/PlayerOne/One`).update({
+      losses: losses
+    });
+    dataRef.ref().child(`/PlayerTwo/Two`).update({
+      wins: wins
+    });
+    $('#'+myChoice.toLowerCase()).css("background-image", "url('assets/images/"+myChoice.toLowerCase()+"_Red.png')");
+    console.log("you won");
+  }
+  else if((myChoice=="Paper"&&otherChoice=="Rock")||(myChoice=="Rock"&&otherChoice=="Scissors")||(myChoice=="Scissors"&&otherChoice=="Paper")){
+    $("#losses").text(losses++);
+    dataRef.ref().child(`/PlayerOne/One`).update({
+      wins: wins
+    });
+    dataRef.ref().child(`/PlayerTwo/Two`).update({
+      losses: losses
+    });
+    $('#'+otherChoice.toLowerCase()).css("background-image", "url('assets/images/"+otherChoice.toLowerCase()+"_Red.png')");
+    console.log("you lost");
+  }
+  else{
+    var tie="tie";
+    console.log(tie);
+  }
+
+  //console.log(otherWins);
+  $("#wins").text(wins);
+  $("#losses").text(losses);
+  $("#turns").text(turns);
+
+  // $( ".outcome" ).html( `<p>wins: <span id="wins">${myWins}</span><br>
+  //         losses: <span id="losses">${myLosses}</span><br>
+  //         turns: <span id="turns">${myTurns}</span></p>`);
   //updateStarCount(postElement, snapshot.val());
 });
+}
 
 
     
@@ -52,7 +100,7 @@ watcher.on('value', function(snapshot) {
 
     ////click a rock paper or scissor////////
         $(document).on("click", "#RPScontainer", function(e,key){
-          turns++
+          turns++;
           e.preventDefault();
           var buttonValue=e.target.title; ////title is either rock paper or scissors//
           //console.log(e.target.id)
@@ -63,7 +111,7 @@ watcher.on('value', function(snapshot) {
           dataRef.ref().once("value", function(snapshot) {
           // Log everything that's coming out of snapshot
            test="1";
-          yourPlayer=="One"?(playerVal=0,oponent=1,opPlayer="PlayerTwo",opNum="Two"): (playerVal=1,oponent=0,opPlayer="PlayerOne",opNum="One");
+          yourPlayer=="One"?(playerVal=0,oponent=1,opPlayer="PlayerTwo",opNum="Two"): (playerVal=1,oponent=0,opPlayer="PlayerOne",opNum="One",runOn());
           //console.log(Object.keys(snapshot.val()));
           //console.log(snapshot.val()[Object.keys(snapshot.val())[playerVal]].PlayerOne.One.choice);
           // console.log(yourPlayer);
@@ -89,8 +137,8 @@ watcher.on('value', function(snapshot) {
         }, function(errorObject) {
           console.log("Errors handled: " + errorObject.code);
         }).then((snap) => {
-          // console.log(snap.val()[yourPlayerTxt+yourPlayer][yourPlayer].choice);
-          // console.log(snap.val()[opPlayer][opNum].choice);
+          //console.log(snap.val()[yourPlayerTxt+yourPlayer][yourPlayer].choice);
+          //console.log(snap.val()[opPlayer][opNum].choice);
           myWins=snap.val()[yourPlayerTxt+yourPlayer][yourPlayer].wins;
           myTurns=snap.val()[yourPlayerTxt+yourPlayer][yourPlayer].turns;
           myLosses=snap.val()[yourPlayerTxt+yourPlayer][yourPlayer].losses;
