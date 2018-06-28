@@ -226,8 +226,11 @@ $(document).ready(function() {
     //console.log(key)
     // If the user has pressed enter
     if (key === 13) {
-      console.log(key);
-      // document.getElementById("txtArea").value = document.getElementById("txtArea").value + "\n*";
+      //console.log(key);
+      whatIwrote = $(
+        "#exampleFormControlTextarea1.form-control.rounded-0"
+      ).val();
+      console.log(whatIwrote);
       dataRef
         .ref()
         .once("value")
@@ -237,15 +240,22 @@ $(document).ready(function() {
             console.log(dataRef.ref());
             messageUpdate = dataRef
               .ref()
-              .set({
-                // messages:{
-                //   message:$("textarea").value
-                //   messages:{
-                //     messages:$("textarea").value
-                // }
+              //.set({
+              .update({
+                messages: {
+                  message: whatIwrote
+                }
               })
+              // messages:{
+              //   message:$("textarea").value
+              //   messages:{
+              //     messages:$("textarea").value
+              // }
+              //})
               .then(snap => {
-                // $("textarea").text(snapshot.val().messages.message)
+                $("#exampleFormControlTextarea1.form-control.rounded-0").text(
+                  yourPlayer + "  " + snapshot.val().messages.message
+                );
               });
           } ///end of snapshot function
         );
