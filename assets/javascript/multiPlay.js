@@ -2,7 +2,7 @@ $(document).ready(function() {
   function buildNewGame() {
     $("#RPScontainer").html(`<div id="rock" title="Rock"></div>
   <div id="paper" title="Paper"></div>
-  <div id="scissors" title="Scissors"></div>`);
+  <div id="scissors" title="Scissors"></div><div id='message'></div>`);
   }
 
   buildNewGame();
@@ -123,7 +123,13 @@ $(document).ready(function() {
       $("#turns").text(turns);
     });
   }
-
+  dataRef.ref().on("child_changed", snapshot => {
+    //console.log(snapshot.val());
+    if (snapshot.val().One.choice) {
+      // $("textarea").val(snapshot.val().PlayerOne.One.choice);
+      console.log(snapshot.val().One.choice);
+    }
+  });
   ////click a rock paper or scissor////////
   $(document).on("click", "#RPScontainer", function(e, key) {
     turns++;
@@ -221,6 +227,14 @@ $(document).ready(function() {
   $("textarea").keypress(function(event) {
     writeTextArea(event);
   });
+
+  dataRef.ref().on("child_changed", snapshot => {
+    console.log(snapshot.val());
+    if (snapshot.val().message) {
+      $("textarea").val(snapshot.val().message);
+    }
+  });
+
   function writeTextArea() {
     var key = window.event.keyCode;
     //console.log(key)
@@ -253,9 +267,11 @@ $(document).ready(function() {
               // }
               //})
               .then(snap => {
-                $("#exampleFormControlTextarea1.form-control.rounded-0").text(
-                  yourPlayer + "  " + snapshot.val().messages.message
-                );
+                // console.log(snap);
+                // console.log(snap.val().messages.message);
+                // $("#exampleFormControlTextarea1.form-control.rounded-0").append(
+                //   yourPlayer + "  " + snapshot.val().messages.message
+                // );
               });
           } ///end of snapshot function
         );
