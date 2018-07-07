@@ -59,13 +59,15 @@ $(document).ready(function() {
           .ref()
           .child(`/PlayerOne/One`)
           .update({
-            losses: losses
+            losses: losses,
+            wins: wins
           });
         dataRef
           .ref()
           .child(`/PlayerTwo/Two`)
           .update({
-            wins: wins
+            wins: wins,
+            losses: losses
           });
         $("#" + myChoice.toLowerCase()).css(
           "background-image",
@@ -82,12 +84,14 @@ $(document).ready(function() {
           .ref()
           .child(`/PlayerOne/One`)
           .update({
-            wins: wins
+            wins: wins,
+            losses: losses
           });
         dataRef
           .ref()
           .child(`/PlayerTwo/Two`)
           .update({
+            wins: wins,
             losses: losses
           });
         $("#" + otherChoice.toLowerCase()).css(
@@ -104,32 +108,15 @@ $(document).ready(function() {
       $("#wins").text(wins);
       $("#losses").text(losses);
       $("#turns").text(turns);
-
-      // $( ".outcome" ).html( `<p>wins: <span id="wins">${myWins}</span><br>
-      //         losses: <span id="losses">${myLosses}</span><br>
-      //         turns: <span id="turns">${myTurns}</span></p>`);
-      //updateStarCount(postElement, snapshot.val());
-      //}catch(err){}
     });
   }
 
-  function runOnTwo() {
-    var watcher = dataRef.ref();
-    //if(snapshot.val().PlayerTwo!=null){}
-    watcher.on("value", function(snapshot) {
-      //console.log(otherWins);
-      $("#wins").text(wins);
-      $("#losses").text(losses);
-      $("#turns").text(turns);
-    });
-  }
-  dataRef.ref().on("child_changed", snapshot => {
-    //console.log(snapshot.val());
-    if (snapshot.val().One.choice) {
-      // $("textarea").val(snapshot.val().PlayerOne.One.choice);
-      console.log(snapshot.val().One.choice);
-    }
-  });
+  // dataRef.ref().on("child_changed", snapshot => {///Still Testing///////////
+  //   console.log(snapshot.val());
+  //   if (snapshot.val().One.choice) {
+  //     console.log(snapshot.val().One.choice);
+  //   }
+  // });
   ////click a rock paper or scissor////////
   $(document).on("click", "#RPScontainer", function(e, key) {
     turns++;
@@ -148,7 +135,6 @@ $(document).ready(function() {
       .once(
         "value",
         function(snapshot) {
-          // Log everything that's coming out of snapshot
           test = "1";
           yourPlayer == "One"
             ? ((playerVal = 0),
@@ -160,29 +146,17 @@ $(document).ready(function() {
               (opPlayer = "PlayerOne"),
               (opNum = "One"),
               runOn());
-          //console.log(Object.keys(snapshot.val()));
-          //console.log(snapshot.val()[Object.keys(snapshot.val())[playerVal]].PlayerOne.One.choice);
-          // console.log(yourPlayer);
-          // console.log(playerVal);
-          var snap = snapshot;
-          //console.log(Object.keys(snapshot.val())[oponent]);
           oponentKey = Object.keys(snapshot.val())[oponent];
-          // if(oponentKey!="undefined"){
-
-          // }
-          // dataRef.ref().child(`/${Object.keys(snapshot.val())[playerVal]}/${yourPlayerTxt+yourPlayer}/${yourPlayer}`).update({
-          //console.log(`/${yourPlayerTxt+yourPlayer}/${yourPlayer}`+"line147")
+          console.log("snapshot for wins" + snapshot.val().PlayerOne.One.wins);
           dataRef
             .ref()
             .child(`/${yourPlayerTxt + yourPlayer}/${yourPlayer}`)
             .update({
               choice: buttonValue,
-              turns: turns
+              turns: turns,
+              wins: 5
+              // wins: wins
             });
-          // console.log(snap.val()[yourPlayerTxt+yourPlayer][yourPlayer].choice);
-          // console.log(snap.val()[opPlayer][opNum].choice);
-          // console.log(snap.val()[Object.keys(snap.val())[playerVal]][player][yourPlayer].choice);/////works
-          // console.log(snap.val()[Object.keys(snap.val())[oponent]][opPlayer][opNum].choice);/////works
 
           // Handle the errors
         },
@@ -229,9 +203,47 @@ $(document).ready(function() {
   });
 
   dataRef.ref().on("child_changed", snapshot => {
-    console.log(snapshot.val());
+    try {
+      playerOneChoice = snapshot.val().One.choice;
+      console.log(playerOneChoice);
+      // ;
+    } catch (err) {}
+    try {
+      playerTwoChoice = snapshot.val().Two.choice;
+      console.log(playerOneChoice);
+      console.log(playerTwoChoice);
+
+      if (
+        (playerOneChoice == "Rock" && playerTwoChoice == "Paper") ||
+        (playerOneChoice == "Paper" && playerTwoChoice == "Scissors") ||
+        (playerOneChoice == "Scissors" && playerTwoChoice == "Rock")
+      ) {
+        //$("#wins").text(wins++);
+        $("#" + playerOneChoice.toLowerCase()).css(
+          "background-image",
+          "url('assets/images/" + playerOneChoice.toLowerCase() + "_Red.png')"
+        );
+        $("#wins").text(snapshot.val().Two.wins);
+        // background-image:none
+        console.log("you won");
+      } else if (
+        (playerOneChoice == "Paper" && playerTwoChoice == "Rock") ||
+        (playerOneChoice == "Rock" && playerTwoChoice == "Scissors") ||
+        (playerOneChoice == "Scissors" && playerTwoChoice == "Paper")
+      ) {
+        // $("#losses").text(losses++);
+        $("#" + playerTwoChoice.toLowerCase()).css(
+          "background-image",
+          "url('assets/images/" + playerTwoChoice.toLowerCase() + "_Red.png')"
+        );
+        console.log("you lost");
+      } else {
+        var tie = "tie";
+        console.log(tie);
+      }
+    } catch (err) {}
     if (snapshot.val().message) {
-      $("textarea").val(snapshot.val().message);
+      $("textarea").val(snapshot.val().message); ////Writes a messages/////
     }
   });
 
