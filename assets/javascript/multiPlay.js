@@ -1,4 +1,4 @@
-$(document).ready(function() {
+$(document).ready(function () {
   function buildNewGame() {
     $("#RPScontainer").html(`<div id="rock" title="Rock"></div>
   <div id="paper" title="Paper"></div>
@@ -29,17 +29,9 @@ $(document).ready(function() {
   var NUM_PLAYERS = 2;
 
   ////////////////////making a listener///////////////////
-  //runOnTwo(); //This is running an on listener to change player one
-
-  function runOn() {
+  function runOn(wins) {
     var watcher = dataRef.ref();
-    watcher.once("value", function(snapshot) {
-      //try{
-      //console.log(snapshot.val());
-      //console.log(snapshot.val()[yourPlayerTxt+yourPlayer][yourPlayer].choice);
-      //console.log(snapshot.val()[opPlayer][opNum].choice);
-      //myWins=snapshot.val()[PlayerOne][One].wins;
-
+    watcher.once("value", function (snapshot) {
       myWins = snapshot.val().PlayerOne.One.wins;
       myTurns = snapshot.val().PlayerOne.One.turns;
       myLosses = snapshot.val().PlayerOne.One.losses;
@@ -60,13 +52,13 @@ $(document).ready(function() {
           .child(`/PlayerOne/One`)
           .update({
             losses: losses,
-            wins: wins
+            wins: wins++
           });
         dataRef
           .ref()
           .child(`/PlayerTwo/Two`)
           .update({
-            wins: wins,
+            wins: wins++,
             losses: losses
           });
         $("#" + myChoice.toLowerCase()).css(
@@ -84,14 +76,14 @@ $(document).ready(function() {
           .ref()
           .child(`/PlayerOne/One`)
           .update({
-            wins: wins,
+            wins: wins++,
             losses: losses
           });
         dataRef
           .ref()
           .child(`/PlayerTwo/Two`)
           .update({
-            wins: wins,
+            wins: wins++,
             losses: losses
           });
         $("#" + otherChoice.toLowerCase()).css(
@@ -111,21 +103,11 @@ $(document).ready(function() {
     });
   }
 
-  // dataRef.ref().on("child_changed", snapshot => {///Still Testing///////////
-  //   console.log(snapshot.val());
-  //   if (snapshot.val().One.choice) {
-  //     console.log(snapshot.val().One.choice);
-  //   }
-  // });
   ////click a rock paper or scissor////////
-  $(document).on("click", "#RPScontainer", function(e, key) {
+  $(document).on("click", "#RPScontainer", function (e, key) {
     turns++;
     e.preventDefault();
     var buttonValue = e.target.title; ////title is either rock paper or scissors//
-    //console.log(e.target.id)
-    //e.target.css("color", "red");
-    //$('#'+e.target.id).css("color", "red");
-    // $('#'+e.target.id).css("background-color", "red");
     $("#" + e.target.id).css(
       "background-image",
       "url('assets/images/" + buttonValue + ".png')"
@@ -134,7 +116,7 @@ $(document).ready(function() {
       .ref()
       .once(
         "value",
-        function(snapshot) {
+        function (snapshot) {
           test = "1";
           yourPlayer == "One"
             ? ((playerVal = 0),
@@ -145,7 +127,7 @@ $(document).ready(function() {
               (oponent = 0),
               (opPlayer = "PlayerOne"),
               (opNum = "One"),
-              runOn());
+              runOn(wins));
           oponentKey = Object.keys(snapshot.val())[oponent];
           console.log("snapshot for wins" + snapshot.val().PlayerOne.One.wins);
           dataRef
@@ -154,51 +136,38 @@ $(document).ready(function() {
             .update({
               choice: buttonValue,
               turns: turns,
-              wins: 5
+              wins: wins++
               // wins: wins
             });
 
           // Handle the errors
         },
-        function(errorObject) {
+        function (errorObject) {
           console.log("Errors handled: " + errorObject.code);
         }
       )
       .then(snap => {
-        //console.log(snap.val()[yourPlayerTxt+yourPlayer][yourPlayer].choice);
-        //console.log(snap.val()[opPlayer][opNum].choice);
         myWins = snap.val()[yourPlayerTxt + yourPlayer][yourPlayer].wins;
         myTurns = snap.val()[yourPlayerTxt + yourPlayer][yourPlayer].turns;
         myLosses = snap.val()[yourPlayerTxt + yourPlayer][yourPlayer].losses;
         $(".outcome").html(`<p>wins: <span id="wins">${myWins}</span><br>
           losses: <span id="losses">${myLosses}</span><br>
           turns: <span id="turns">${myTurns}</span></p>`);
-        //   const key = snap.key
-        //   console.log(key);
-        //   dataRef.ref().child(`/${key}/${yourPlayerTxt+yourPlayer}/${yourPlayer}`).update({
-        //     PlayerId: key
-
-        // });
       });
-
-    //dataRef = dataRef.getInstance().getReference("turns");
   }); ////end of rps click
 
   // Capture Button Click
-  $("#send.btn.btn-primary").on("click", function(event) {
+  $("#send.btn.btn-primary").on("click", function (event) {
     event.preventDefault();
     name = $("#player")
       .val()
       .trim();
-    writeData(dataRef);
+    writeData(dataRef); ///Sets up the users data base
     $(this).attr("disabled", true);
-    //runOnTwo();this causes an infinit loop.
   });
 
-  //onkeypress="onTestChange()
-  //.keypress(function() {
-
-  $("textarea").keypress(function(event) {
+  ///write in the text area and have it show on both users/////
+  $("textarea").keypress(function (event) {
     writeTextArea(event);
   });
 
@@ -207,7 +176,7 @@ $(document).ready(function() {
       playerOneChoice = snapshot.val().One.choice;
       console.log(playerOneChoice);
       // ;
-    } catch (err) {}
+    } catch (err) { }
     try {
       playerTwoChoice = snapshot.val().Two.choice;
       console.log(playerOneChoice);
@@ -218,30 +187,30 @@ $(document).ready(function() {
         (playerOneChoice == "Paper" && playerTwoChoice == "Scissors") ||
         (playerOneChoice == "Scissors" && playerTwoChoice == "Rock")
       ) {
-        //$("#wins").text(wins++);
+        //////Player two wins///////
         $("#" + playerOneChoice.toLowerCase()).css(
           "background-image",
           "url('assets/images/" + playerOneChoice.toLowerCase() + "_Red.png')"
         );
         $("#wins").text(snapshot.val().Two.wins);
         // background-image:none
-        console.log("you won");
+        console.log("Player Two won");
       } else if (
         (playerOneChoice == "Paper" && playerTwoChoice == "Rock") ||
         (playerOneChoice == "Rock" && playerTwoChoice == "Scissors") ||
         (playerOneChoice == "Scissors" && playerTwoChoice == "Paper")
       ) {
-        // $("#losses").text(losses++);
+        ////Player one wins///////////////
         $("#" + playerTwoChoice.toLowerCase()).css(
           "background-image",
           "url('assets/images/" + playerTwoChoice.toLowerCase() + "_Red.png')"
         );
-        console.log("you lost");
+        console.log("Player Two lost");
       } else {
         var tie = "tie";
         console.log(tie);
       }
-    } catch (err) {}
+    } catch (err) { }
     if (snapshot.val().message) {
       $("textarea").val(snapshot.val().message); ////Writes a messages/////
     }
@@ -261,7 +230,7 @@ $(document).ready(function() {
         .ref()
         .once("value")
         .then(
-          function(snapshot) {
+          function (snapshot) {
             //var playerExists=snapshot.val();
             console.log(dataRef.ref());
             messageUpdate = dataRef
@@ -298,7 +267,7 @@ $(document).ready(function() {
       .ref()
       .once("value")
       .then(
-        function(snapshot) {
+        function (snapshot) {
           var playerExists = snapshot.val();
           if (playerExists == null) {
             yourPlayer = "One";
